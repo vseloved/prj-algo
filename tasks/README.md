@@ -51,9 +51,9 @@
 (and (not (and (or (and x (not y))
                    (and (not x) y))
                x))
-     (or (and (or (and x (not y))
-                  (and (not x) y))
-              x)))
+     (not (and (not (or (and x (not y))
+                        (and (not x) y)))
+               x)))
 ```
 
 Задание 2. Преобразуйте в выражение, содержащее `if` (c учетом того, что `(if x y z)` — это выражение, которое выдает значение `z`, если `x` — ложь и `y` в ином случае:
