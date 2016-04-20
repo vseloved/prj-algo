@@ -1,0 +1,24 @@
+ *  (or (and x y)
+    (and z y))
+	====
+	(and Y (or x z))
+	
+ *  (or (and x y)
+    (and (not x) y))
+	====
+	(y)
+
+ *  (and (not x)
+     (or (not y)
+         (not (and x y))))
+	====
+	(not x)
+	
+ *  (and (not (and (or (and x (not y))
+                   (and (not x) y))
+               x))
+     (or (and (or (and x (not y))
+                  (and (not x) y))
+              x)))
+	====
+	(not x)
