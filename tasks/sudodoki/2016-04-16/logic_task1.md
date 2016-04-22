@@ -29,6 +29,5 @@
 ```
 ->
 ```
-(and (or (xor x y) x)
-     (or (not y)))
+(or x (not y))
 ```
