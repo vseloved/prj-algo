@@ -1,0 +1,38 @@
+Задание 1
+
+(or (and x y) (and z y)) = (and y (or x z))
+
+(or (and x y) (and (not x) y)) = (and y (or x (not x))) = (and y true)= y
+
+(and (not x) (or (not y) (not (and x y)))) 
+= (and (not x) (or (not y) (not x) (not y))) # DeMorgan's Law
+= (and (not x) (or (not y) (not x)))         # Idempotent Law?
+= not x # виходить по табл. істинності
+
+(and (not (and (or (and x (not y))
+                   (and (not x) y))
+               x))
+     (not (and (not (or (and x (not y))
+                        (and (not x) y)))
+               x)))
+= ((not (((x and (not y)) or ((not x) and y)) and x)) and (not ((not ((x and (not y)) or ((not x) and y))) and x))) 
+1) ((not (((x and (not y)) or ((not x) and y)) and x))
+   = not(x and x and not(y) or not(x) and x and y)
+   = not(x and not(y) or F)
+   = not(x and not(y)) + T
+   = not(x) or T = not(x)
+2) (not ((not ((x and (not y)) or ((not x) and y))) and x))) 
+   = x and not(y) or not(x) and y or not(x)
+   = T or T or not(x)
+   = not(x)
+
+Результат: not(x) and not(x) = not(x)
+
+Задание 2
+(or (and (not x) (not y))
+    (and x z))
+((not x) and (not y)) or (x and z)
+
+= if not(x) not(y) (x and z)
+= if xy not(x and z)
+= if x y not(z)
