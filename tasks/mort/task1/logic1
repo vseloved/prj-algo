@@ -1,0 +1,5 @@
+1.
+    - (and y (or x z)
+    - y
+    - not x
+    - not x
