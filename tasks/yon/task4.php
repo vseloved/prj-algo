@@ -1,3 +1,4 @@
+<?php
 function findPosition($array, $find)
 {
     if(count($array)>0 && count($array)!=1)
