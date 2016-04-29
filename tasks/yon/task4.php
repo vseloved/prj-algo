@@ -1,6 +1,6 @@
 function findPosition($array, $find)
 {
-    if(count($array)>0)
+    if(count($array)>0 && count($array)!=1)
     {
         $center = (int)ceil(count($array)/2);
         if($array[$center] == $find)
@@ -19,6 +19,14 @@ function findPosition($array, $find)
                 return findPosition($newArray, $find);
             else return 'not found';
         }
+    }
+    elseif(count($array)==1)
+    {
+        $new_arr = array_values($array);
+        if($new_arr[0] == $find)
+            echo array_keys($array)[0];
+        else
+            echo 'not found';
     }
     else
     {
