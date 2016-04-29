@@ -1,4 +1,3 @@
-<?php
 function findPosition($array, $find)
 {
     if(count($array)>0)
@@ -23,7 +22,7 @@ function findPosition($array, $find)
     }
     else
     {
-        return 'rong format';
+        echo 'rong format';
     }
 
 }
