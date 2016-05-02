@@ -1,4 +1,4 @@
-def insertion_sort(a):
+def selection_sort(a):
     print(a)
     lenA = len(a)
     for key in range(0, lenA - 1):
@@ -16,5 +16,5 @@ def insertion_sort(a):
         print(a)
 
 a = [2, 8, 6, 4, 7, 4, 4, 123, 14, 5, 52, 23]
-insertion_sort(a)
+selection_sort(a)
 print(a)
