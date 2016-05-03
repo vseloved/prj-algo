@@ -1,3 +1,5 @@
 ### Множества
 
-; TODO: scan pictures
+![](words.jpg)
+![](numbers.jpg)
+![](people.jpg)
