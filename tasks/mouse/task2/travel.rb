@@ -27,10 +27,15 @@ def road_trip(points)
     shortest_dist = 0
     shortest_edge = []
     combination.each do |combo|
-      dist = get_dist(combo[0], combo[1])
-      if (shortest_dist == 0) || (shortest_dist > dist)
-        shortest_dist = dist
-        shortest_edge = [combo[0], combo[1]]
+      ones = metapoints.map{ |key,value| value==1 ? key : nil }.compact
+      if ones.sort! == combo.sort!
+        next
+      else
+        dist = get_dist(combo[0], combo[1])
+        if (shortest_dist == 0) || (shortest_dist > dist)
+          shortest_dist = dist
+          shortest_edge = [combo[0], combo[1]]
+        end
       end
     end
     combination.delete(shortest_edge)
