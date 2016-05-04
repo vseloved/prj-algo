@@ -145,9 +145,9 @@
             return step(newTakenVertices, newAvailableVertices, connectedDots, pointDictionary)
           }
           let result = step([], vertices, {}, points.reduce((memo, {id}) => {
-                        memo[id] = 0;
-                        return memo;
-                      }, {}));
+            memo[id] = 0;
+            return memo;
+          }, {}));
           draw()
           const {takenVertices, pointDictionary } = result;
           const finalVerticeIds = Object.keys(pointDictionary).filter(id => pointDictionary[id] === 1).map((i) => parseInt(i, 10))
