@@ -71,7 +71,7 @@
 
         kickOff = (points = generatePoints(5)) => {
           window.debugPoints = points;
-          const vertices = generateVertices(points)
+          const vertices = generateVertices(points).sort(function (thisV, otherV) { return thisV.distance - otherV.distance})
           const drawingStack = [];
           const draw = () => {
             const drawVertice = (ctx, {coord: [startX, startY]}, {coord: [finishX, finishY]}, color = '#888') => {
@@ -128,7 +128,7 @@
           const step = (takenVertices, availableVertices, connectedDots, pointDictionary) => {
             drawingStack.push({takenVertices, availableVertices});
             if (!availableVertices.length) { return {takenVertices, connectedDots, pointDictionary, points};}
-            let willBeTaking = availableVertices.sort(function (thisV, otherV) { return thisV.distance - otherV.distance})[0];
+            let willBeTaking = availableVertices[0];
             willBeTaking.nodes.forEach((id, i, bothIds) => {
               pointDictionary[id] = (pointDictionary[id] || 0) + 1
               const anotherId = bothIds.find((_id) => _id !== id);
