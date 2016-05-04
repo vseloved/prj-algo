@@ -28,13 +28,34 @@
   <body>
     <canvas id="stage" width="400" height="400"></canvas>
     <script>
+        // https://github.com/jonschlinkert/array-unique/blob/master/index.js
+        function unique(arr) {
+          if (!Array.isArray(arr)) {
+            throw new TypeError('array-unique expects an array.');
+          }
+
+          var len = arr.length;
+          var i = -1;
+
+          while (i++ < len) {
+            var j = i + 1;
+
+            for (; j < arr.length; ++j) {
+              if (arr[i] === arr[j]) {
+                arr.splice(j--, 1);
+              }
+            }
+          }
+          return arr;
+        };
+
         const getRandom = (lower = 0, upper = 100) => lower + Math.floor(Math.random() * upper)
         const times = (length) => Array.apply(Array, { length })
         const generatePoints = (n, dimensions = 2) =>
           times(n).map((_, i) => {
             return dimensions === 1 ?
               {id: i, coord: getRandom()}
-              : {id: i, coord: times(dimensions).map(_ => getRandom())}
+              : {id: i, coord: times(dimensions).map(_ => getRandom(30, 250))}
           })
 
         const distance = ({coord: [x1, y1]}, {coord: [x2, y2]}) =>
@@ -47,11 +68,20 @@
               distance: distance(initialPoint, anotherPoint)
             })));
           }, [])
-        var i = 0;
+
         kickOff = (points = generatePoints(5)) => {
+          window.debugPoints = points;
           const vertices = generateVertices(points)
           const drawingStack = [];
           const draw = () => {
+            const drawVertice = (ctx, {coord: [startX, startY]}, {coord: [finishX, finishY]}, color = '#888') => {
+              ctx.beginPath();
+              ctx.strokeStyle = color;
+              ctx.lineWidth = 2;
+              ctx.moveTo(startX, startY)
+              ctx.lineTo(finishX, finishY);
+              ctx.stroke();
+            }
             const {takenVertices, availableVertices} = drawingStack.shift();
             const canvas = document.getElementById('stage');
             const ctx = canvas.getContext('2d');
@@ -60,92 +90,79 @@
             takenVertices.forEach(({nodes}) => {
               const fromP = points.find(({id}) => id === nodes[0])
               const toP = points.find(({id}) => id === nodes[1])
-              ctx.beginPath();
-              ctx.strokeStyle = '#0F0';
-              ctx.moveTo(fromP.coord[0], fromP.coord[1])
-              ctx.lineTo(toP.coord[0], toP.coord[1]);
-              ctx.stroke();
+              drawVertice(ctx, fromP, toP, '#0F0');
             })
             availableVertices.forEach(({nodes}) => {
               const fromP = points.find(({id}) => id === nodes[0])
               const toP = points.find(({id}) => id === nodes[1])
-              ctx.beginPath();
-              ctx.strokeStyle = '#888';
-              ctx.moveTo(fromP.coord[0], fromP.coord[1])
-              ctx.lineTo(toP.coord[0], toP.coord[1]);
-              ctx.stroke();
+              drawVertice(ctx, fromP, toP);
             })
-            points.forEach(({coord: [x, y]}) => {
+            points.forEach(({id, coord: [x, y]}) => {
               ctx.beginPath();
               ctx.strokeStyle = 'red';
               ctx.fillStyle = 'red';
-              ctx.strokeRect(x, y, 2, 2);
+              ctx.fillRect(x - 2.5, y - 2.5, 5, 5);
+
+              ctx.strokeStyle = 'black';
+              window.ctx = ctx;
+              ctx.lineWidth = 1;
+              ctx.font = "15px serif";
+              ctx.strokeText(id,x + 4, y + 4);
               ctx.stroke();
             })
             if (drawingStack.length) {
-              setTimeout(draw, 2000);
+              setTimeout(draw, 1000);
             }
-
           }
-          const step = (takenVertices, availableVertices, pointDictionary) => {
+          const updateConnected = (connectedDots, thisId, anotherId) => {
+            const connected = (dict, id1, id2) => {
+              return unique((dict[id1] || []).concat(dict[id2] || []).concat(id1).concat(id2))
+            };
+            connectedDots[thisId] = connected(connectedDots, thisId, anotherId)
+            connectedDots[thisId].forEach(function (connectedId) {
+              connectedDots[connectedId] = connected(connectedDots, connectedId, anotherId);
+            })
+            return connectedDots
+          }
+
+          const step = (takenVertices, availableVertices, connectedDots, pointDictionary) => {
             drawingStack.push({takenVertices, availableVertices});
-            if (!availableVertices.length) { return {takenVertices, pointDictionary, points};}
+            if (!availableVertices.length) { return {takenVertices, connectedDots, pointDictionary, points};}
             let willBeTaking = availableVertices.sort(function (thisV, otherV) { return thisV.distance - otherV.distance})[0];
-            willBeTaking.nodes.forEach((id) => pointDictionary[id] = (pointDictionary[id] || 0) + 1);
+            willBeTaking.nodes.forEach((id, i, bothIds) => {
+              pointDictionary[id] = (pointDictionary[id] || 0) + 1
+              const anotherId = bothIds.find((_id) => _id !== id);
+              updateConnected(connectedDots, id, anotherId)
+            })
             let newTakenVertices = takenVertices.concat(willBeTaking);
-            // TODO: Fix this condition
             let newAvailableVertices = availableVertices.filter(({nodes}) => {
               return !willBeTaking.nodes.every((node) => nodes.includes(node)) &&
-                pointDictionary[nodes[0]] + pointDictionary[nodes[1]] <= 2
+                  pointDictionary[nodes[0]] < 2 &&
+                  pointDictionary[nodes[1]] < 2 &&
+                  !(connectedDots[nodes[0]] || []).includes(nodes[1]) &&
+                  !(connectedDots[nodes[1]] || []).includes(nodes[0]);
             });
-            return step(newTakenVertices, newAvailableVertices, pointDictionary)
+            return step(newTakenVertices, newAvailableVertices, connectedDots, pointDictionary)
           }
-          let result = step([], vertices, points.reduce((memo, {id}) => {
-            memo[id] = 0;
-            return memo;
-          }, {}));
+          let result = step([], vertices, {}, points.reduce((memo, {id}) => {
+                        memo[id] = 0;
+                        return memo;
+                      }, {}));
           draw()
-          return result;
+          const {takenVertices, pointDictionary } = result;
+          const finalVerticeIds = Object.keys(pointDictionary).filter(id => pointDictionary[id] === 1).map((i) => parseInt(i, 10))
+          const finalVerticeStart = points.find(({id}) => id === finalVerticeIds[0]);
+          const finalVerticeFinish = points.find(({id}) => id === finalVerticeIds[1]);
+          const newTakenVertices = takenVertices.concat({nodes: finalVerticeIds, distance: distance(finalVerticeStart, finalVerticeFinish)});
+          drawingStack.push({takenVertices: newTakenVertices, availableVertices: []});
+          return {
+            points,
+            takenVertices: newTakenVertices
+          };
         }
-        var predef = [
-          {
-            "id": 0,
-            "coord": [
-              40,
-              150
-            ]
-          },
-          {
-            "id": 1,
-            "coord": [
-              20,
-              80
-            ]
-          },
-          {
-            "id": 2,
-            "coord": [
-              100,
-              10
-            ]
-          },
-          {
-            "id": 3,
-            "coord": [
-              50,
-              150
-            ]
-          },
-          {
-            "id": 4,
-            "coord": [
-              87,
-              5
-            ]
-          }
-        ]
-        const {takenVertices} = kickOff(predef);
-        console.log('Result: ', takenVertices.map(({nodes}) => `${nodes[0]} - ${nodes[1]}`))
+        const {takenVertices, points} = kickOff();
+        console.log('Result Route Vertices: ', takenVertices.map(({nodes}) => `${nodes[0]} - ${nodes[1]}`))
+        console.log('Result Distance: ', takenVertices.reduce((memo, {distance}) => memo + distance, 0))
     </script>
   </body>
 </html>
