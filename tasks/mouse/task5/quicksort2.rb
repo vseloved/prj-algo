@@ -13,24 +13,14 @@ def partition(array, left, right)
   return i
 end
 
-def partition_median3(array, left, right)
+def partition_median3(array, left, right )
   middle = ((right - left) / 2).to_i
   list = [array[left],array[middle],array[right]]
   list.sort!
   pivot = list[1]
   pivot_i = array.index(list[1])
   array[pivot_i], array[left] = array[left], array[pivot_i]
-  i = left
-  array[i], array[right] = array[right], array[i] 
-  for j in (left..right-1) 
-    if array[j] < pivot
-      array[j], array[i] = array[i], array[j]
-      i = i + 1
-    end
-  end
-
-  array[i], array[right] = array[right], array[i]
-  return i
+  partition(array, left, right)
 end
 
 def partition_median9(array, left, right)
@@ -47,20 +37,9 @@ def partition_median9(array, left, right)
   else
     pivot = array[left]
   end
-  puts pivot
   pivot_i = array.index(pivot)
   array[pivot_i], array[left] = array[left], array[pivot_i]
-  i = left
-  array[i], array[right] = array[right], array[i] 
-  for j in (left..right-1) 
-    if array[j] < pivot
-      array[j], array[i] = array[i], array[j]
-      i = i + 1
-    end
-  end
-
-  array[i], array[right] = array[right], array[i]
-  return i
+  partition(array, left, right)
 end
 
 def quicksort(array, left, right)
