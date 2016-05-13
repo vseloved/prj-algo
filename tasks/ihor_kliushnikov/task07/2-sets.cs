@@ -27,6 +27,9 @@ namespace ConsoleApplication1.DataStructures
 
                 yield return a;
             }
+
+            for (var i = j; i < other.Length; i++)
+                yield return other[i];
         }
 
         public IEnumerable<int> Intersection(Set otherSet)
@@ -36,7 +39,7 @@ namespace ConsoleApplication1.DataStructures
 
             foreach (var a in Values)
             {
-                while (j < other.Length && a > other[j])
+                while (j < other.Length - 1 && a > other[j])
                     j++;
 
                 if (a == other[j])
@@ -51,7 +54,7 @@ namespace ConsoleApplication1.DataStructures
 
             foreach (var a in Values)
             {
-                while (j < other.Length && a > other[j])
+                while (j < other.Length - 1 && a > other[j])
                     j++;
 
                 if (a != other[j])
