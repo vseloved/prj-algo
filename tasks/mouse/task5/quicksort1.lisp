@@ -1,0 +1,13 @@
+(defun quicksort(list)
+    (if (eql (length list) 1)
+        (return-from quicksort list))
+    (if (not list )
+        (return-from quicksort '())
+        (let* ((pivot (first list))
+              (prepivot (remove-if (lambda (e) (>= e pivot)) list))
+              (postpivot (remove-if (lambda (e) (<= e pivot)) list)))
+              (let ((result (concatenate 'list 
+                                         (quicksort prepivot) 
+                                         (list pivot) 
+                                         (quicksort postpivot)))) 
+                   (return-from quicksort result)))))
