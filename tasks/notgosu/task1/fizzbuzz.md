@@ -1,0 +1,22 @@
+(defun fizzbuzz ()
+    (do 
+        ((num 1 (1+ num)))
+        ((> num 100))
+        (let ((symb ""))  
+                 (if (= (rem num 3) 0)
+                    (setq symb (concatenate 'string symb "Fizz"))
+                 )
+                 (if (= (rem num 5) 0)
+                    (setq symb (concatenate 'string symb "Buzz"))
+                 )
+                 (if (= (length symb) 0)
+                     (setq symb (concatenate 'string symb (write-to-string num)))
+                 )
+
+                 (princ symb)
+                 (princ " ")
+            )
+        )
+)
+
+(fizzbuzz)
