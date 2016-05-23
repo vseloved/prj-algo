@@ -33,7 +33,15 @@ def get_pivot(a: list):
 
 
 def partitioning_inplace(a: list, s, e):
+    print(' ', a, s, e)
     i = s
+    for j in range(s, e - 1):
+        print(a, j, i)
+        if a[j] <= a[e - 1]:
+            a[j], a[i] = a[i], a[j]
+            i += 1
+    a[i], a[e - 1] = a[e - 1], a[i]
+    return i
 
 
 
@@ -45,4 +53,5 @@ def quick_sort_inplace(a: list, s, e):
 
 
 a = [6, 2, 8, 6, 4, 7, 4, 4, 123, 14, 5, 52, 23]
-print(quick_sort(a))
+quick_sort_inplace(a, 0, len(a))
+print(a)
