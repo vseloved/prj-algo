@@ -60,7 +60,7 @@ function Hash(size = 8) {
       }
       let i = (start + 1) % size;
       while (i !== start) {
-        if (backend[i].key == key) {
+        if (backend[i] && backend[i].key == key) {
           return (backend[i].value)
         }
         i = (i + 1) % size
