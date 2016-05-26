@@ -16,3 +16,77 @@
 // Реализовать следующие методы расширения:
 //
 // 1б. создание параллельной таблицы и постепенный перенос данных в нее при каждом обращении (при этом новые данные записываются в новую таблицу, а старые постепенно переписываются партиями по несколько элементов)
+
+"use strict";
+const gethash = (string) => {
+  let hash = 7
+  for (let char of string) {
+    hash = hash * 31 + char.charCodeAt(0)
+  }
+  return hash;
+}
+function Hash(size = 8) {
+  var backend = [];
+  const setKey = (key, value) => {
+    let start = gethash(key) % size;
+    if (!backend[start] || backend[start].key == key) {
+      return backend[start] = {key, value}
+    }
+    let i = start + 1 % size;
+    while (i !== start) {
+      if (!backend[i]) {
+        return (backend[i] = {key, value})
+      }
+      i = (i + 1) % size
+    }
+    throw new Error('Could not set value - no space left', JSON.stringify(backend))
+  }
+  return {
+    inspect() {
+      return {backend, size};
+    },
+    getByKey(key) {
+      let start = gethash(key) % size;
+      if (backend[start] && backend[start].key == key) {
+        return (backend[start].value)
+      }
+      let i = (start + 1) % size;
+      while (i !== start) {
+        if (backend[i] && backend[i].key == key) {
+          return (backend[i].value)
+        }
+        i = (i + 1) % size
+      }
+      return null
+    },
+    setKey,
+    deleteKey(key) {
+      let start = gethash(key) % size;
+      if (backend[start] && backend[start].key == key) {
+        return backend[start] = undefined;
+      }
+      let i = (start + 1) % size;
+      while (i !== start) {
+        if (backend[i] && backend[i].key == key) {
+          return backend[i] = undefined;
+        }
+        i = (i + 1) % size
+      }
+      return "Nothing deleted, no key found"
+    }
+  }
+}
+
+
+var hash = Hash(8)
+hash.setKey('John', 'boy');
+console.log(hash.getByKey('John'))
+console.log(hash.setKey('John', 2))
+console.log(hash.setKey('Lorem', 3))
+console.log(hash.setKey('ipsum', 4))
+console.log(hash.setKey('dolor2', 5))
+console.log(hash.setKey('sit', 15))
+console.log(hash.setKey('amet', 45))
+console.log(hash.setKey('consectetur', 55))
+console.log(hash.setKey('adipiscing', 58))
+console.log(hash.setKey('elit', 59))
