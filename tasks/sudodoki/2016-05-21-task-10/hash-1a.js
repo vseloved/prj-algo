@@ -25,7 +25,6 @@ const gethash = (string) => {
   return hash;
 }
 function Hash(size = 8) {
-  console.log('size is ', size);
   var backend = [];
   const setKey = (key, value) => {
     let start = gethash(key) % size;
