@@ -27,25 +27,83 @@ const gethash = (string) => {
 }
 function Hash(size = 8) {
   var backend = [];
-  const setKey = (key, value) => {
-    let start = gethash(key) % size;
-    if (!backend[start] || backend[start].key == key) {
-      return backend[start] = {key, value}
+  var backendNew, newSize;
+  const resize = () => {
+    backendNew = [];
+    newSize = size * 2;
+  }
+  const move = (n) => {
+    for (let i = 0; i < n; i++) {
+      let toMove = backend.find(_i => _i);
+      if (!toMove) return
+      setKey(toMove.key, toMove.value, false);
+      deleteKey(toMove.key);
     }
-    let i = start + 1 % size;
+  }
+  const deleteKey = (key) => {
+    const hasNew = !!backendNew;
+    let start = gethash(key) % size;
+    if (backend[start] && backend[start].key == key) {
+      return backend[start] = undefined;
+    }
+    let i = (start + 1) % size;
     while (i !== start) {
-      if (!backend[i]) {
-        return (backend[i] = {key, value})
+      if (backend[i] && backend[i].key == key) {
+        return backend[i] = undefined;
       }
       i = (i + 1) % size
     }
-    throw new Error('Could not set value - no space left', JSON.stringify(backend))
+    if (hasNew) {
+      if (backendNew[start] && backendNew[start].key == key) {
+        return (backendNew[start] = undefined);
+      }
+      let i = (start + 1) % newSize;
+      while (i !== start) {
+        if (backendNew[i] && backendNew[i].key == key) {
+          return backendNew[i] = undefined;
+        }
+        i = (i + 1) % newSize
+      }
+    }
+    return "Nothing deleted, no key found"
+  }
+  const setKey = (key, value, initiatedByUser = true) => {
+    if (backend.length && !backend.filter(i => !!i).length) {
+      backend = backendNew;
+      size = newSize;
+      backendNew = undefined;
+      newSize = undefined;
+    }
+    const hasNew = !!backendNew;
+    let toSet = hasNew ? backendNew : backend;
+    let maxSize = hasNew ? newSize : size;
+    let start = gethash(key) % maxSize;
+    deleteKey(key);
+    if (!toSet[start] || toSet[start].key == key) {
+      if (hasNew && initiatedByUser) {
+        move(2);
+      }
+      return toSet[start] = {key, value}
+    }
+    let i = start + 1 % maxSize;
+    while (i !== start) {
+      if (!toSet[i]) {
+        if (hasNew && initiatedByUser) {
+          move(2);
+        }
+        return (toSet[i] = {key, value})
+      }
+      i = (i + 1) % maxSize
+    }
+    resize()
+    setKey(key, value);
   }
   return {
     inspect() {
-      return {backend, size};
+      return {backend, size, backendNew, newSize};
     },
     getByKey(key) {
+      const hasNew = !!backendNew;
       let start = gethash(key) % size;
       if (backend[start] && backend[start].key == key) {
         return (backend[start].value)
@@ -57,36 +115,42 @@ function Hash(size = 8) {
         }
         i = (i + 1) % size
       }
+      if (hasNew) {
+        if (backendNew[start] && backendNew[start].key == key) {
+          return (backendNew[start].value)
+        }
+        let i = (start + 1) % newSize;
+        while (i !== start) {
+          if (backendNew[i] && backendNew[i].key == key) {
+            return (backendNew[i].value)
+          }
+          i = (i + 1) % newSize
+        }
+      }
       return null
     },
     setKey,
-    deleteKey(key) {
-      let start = gethash(key) % size;
-      if (backend[start] && backend[start].key == key) {
-        return backend[start] = undefined;
-      }
-      let i = (start + 1) % size;
-      while (i !== start) {
-        if (backend[i] && backend[i].key == key) {
-          return backend[i] = undefined;
-        }
-        i = (i + 1) % size
-      }
-      return "Nothing deleted, no key found"
-    }
+    deleteKey
   }
 }
 
 
-var hash = Hash(8)
-hash.setKey('John', 'boy');
-console.log(hash.getByKey('John'))
-console.log(hash.setKey('John', 2))
-console.log(hash.setKey('Lorem', 3))
-console.log(hash.setKey('ipsum', 4))
-console.log(hash.setKey('dolor2', 5))
-console.log(hash.setKey('sit', 15))
-console.log(hash.setKey('amet', 45))
-console.log(hash.setKey('consectetur', 55))
-console.log(hash.setKey('adipiscing', 58))
-console.log(hash.setKey('elit', 59))
+// var hash = Hash(8)
+// hash.setKey('John', 'boy');
+// console.log(hash.getByKey('John'))
+// console.log(hash.setKey('John', 2))
+// console.log(hash.setKey('Lorem', 3))
+// console.log(hash.setKey('ipsum', 4))
+// console.log(hash.setKey('dolor2', 5))
+// console.log(hash.setKey('sit', 15))
+// console.log(hash.setKey('amet', 45))
+// console.log(hash.setKey('consectetur', 55))
+// console.log(hash.setKey('adipiscing', 58))
+// console.log(hash.setKey('elit', 59))
+// console.log(hash.getByKey('John'))
+// console.log(hash.setKey('adipiscing', 59))
+// console.log(hash.setKey('random', 14))
+// console.log(hash.setKey('text', 9))
+// console.log(hash.deleteKey('text'))
+// console.log(hash.setKey('newish', 9))
+// console.log(hash.inspect())
