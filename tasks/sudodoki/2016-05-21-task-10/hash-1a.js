@@ -24,8 +24,9 @@ const gethash = (string) => {
   }
   return hash;
 }
-function Hash(size = 8) {
-  var backend = [];
+function Hash(size = 8, cnstrctr = Array) {
+  var backend = new cnstrctr;
+  cnstrctr.size = size; // for introspection purposes
   const setKey = (key, value) => {
     let start = gethash(key) % size;
     if (!backend[start] || backend[start].key == key) {
@@ -44,6 +45,7 @@ function Hash(size = 8) {
   const resize = (newSize) => {
     let oldEntries = backend.splice(0,backend.length)
     size = size * 2;
+    cnstrctr.size = size; // for introspection purposes
     for (let {key, value} of oldEntries) {
       setKey(key, value)
     }
@@ -84,8 +86,8 @@ function Hash(size = 8) {
   }
 }
 
-
-var hash = Hash(8)
+(module || window).exports = Hash;
+// var hash = Hash(8)
 // hash.setKey('John', 'boy');
 // console.log(hash.getByKey('John'))
 // console.log(hash.setKey('John', 2))

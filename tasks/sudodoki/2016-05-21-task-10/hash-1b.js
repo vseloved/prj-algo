@@ -25,12 +25,15 @@ const gethash = (string) => {
   }
   return hash;
 }
-function Hash(size = 8) {
-  var backend = [];
+function Hash(size = 8, cnstrctr = Array) {
+  var backend = new cnstrctr;
+  // TODO: clarify task
+  cnstrctr.size = size; // for introspection purposes
   var backendNew, newSize;
   const resize = () => {
-    backendNew = [];
+    backendNew = new cnstrctr;
     newSize = size * 2;
+    cnstrctr.size = newSize; // for introspection purposes
   }
   const move = (n) => {
     for (let i = 0; i < n; i++) {
@@ -134,6 +137,7 @@ function Hash(size = 8) {
   }
 }
 
+(module || window).exports = Hash;
 
 // var hash = Hash(8)
 // hash.setKey('John', 'boy');
