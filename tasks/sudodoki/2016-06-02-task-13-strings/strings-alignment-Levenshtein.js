@@ -94,6 +94,6 @@ const align = (firstWord, secondWord, costMatrix = COSTS) => {
 
 align('Hlelo', 'Hello');
 /*
-Hl⇄elo
-He llo
+Hl̶el-o
+H-ello
 */

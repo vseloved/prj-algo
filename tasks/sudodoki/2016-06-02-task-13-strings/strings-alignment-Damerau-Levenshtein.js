@@ -140,6 +140,6 @@ const align = (firstWord, secondWord, operations = OPERATIONS) => {
 
 align('Hlelo', 'Hello');
 /*
-Hl̶el-o
-H-ello
+Hl⇄elo
+He llo
 */
