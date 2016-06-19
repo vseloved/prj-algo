@@ -1,6 +1,6 @@
 // ### Выравнивание строк
 //
-// Реализовать алгоритм выравнивания строк на основании метрик Левенштейна и Дамеро-Левенштейна.
+// Реализовать алгоритм выравнивания строк на основании метрик Левенштейна.
 // Найти примеры, для которых они дают разные результаты выравнивания.
 
 
@@ -64,6 +64,7 @@ const align = (firstWord, secondWord, costMatrix = COSTS) => {
       );
     }
   }
+
   const ops = traceback(result, columnCount, rowCount);
   let printRow1 = '';
   let printRow2 = '';
@@ -91,4 +92,8 @@ const align = (firstWord, secondWord, costMatrix = COSTS) => {
   console.log(printRow2)
 }
 
-align('Hello', 'Hall');
+align('Hlelo', 'Hello');
+/*
+Hl⇄elo
+He llo
+*/
